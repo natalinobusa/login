@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" ng-app="myApp">
+<head>
+  <meta charset="utf-8">
+  <title>My AngularJS App</title>
+  <link rel="stylesheet" href="css/app.css"/>
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="lib/bootstrap/3.2.0/css/bootstrap.min.css">
+
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="lib/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+
+</head>
+<body ng-controller="appCtrl">
+
+  <div ng-include="'html/includes/nav.html'"></div>
+  <div ng-include="'html/includes/alert.html'"></div>
+
+  <div ng-view></div>
+
+  <!-- angular -->
+  <script src="lib/angular/1.2.25/angular.min.js"></script>
+  <script src="lib/angular/1.2.25/angular-route.min.js"></script>
+
+  <!-- Latest compiled and minified Angular bootstrap ui -->
+  <script src="lib/angular-ui/0.11.0/ui-bootstrap-tpls.min.js"></script>
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <!-- <script src="lib/jquery/1.11.1/jquery.min.js"></script> -->
+
+  <!-- Latest compiled and minified JavaScript -->
+  <!-- <script src="lib/bootstrap/3.2.0/js/bootstrap.min.js"></script> -->
+
+  <script src="js/app.js"></script>
+  <script src="js/constants.js"></script>
+
+  <script src="js/controllers/appCtrl.js"></script>
+  <script src="js/controllers/loginCtrl.js"></script>
+  <script src="js/controllers/signupCtrl.js"></script>
+  <script src="js/controllers/homeCtrl.js"></script>
+
+  <script src="js/services/userAuthService.js"></script>
+  <script src="js/services/sessionService.js"></script>
+
+</body>
+</html>

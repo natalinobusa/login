@@ -1,0 +1,41 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Login</h3>
+                </div>
+                <div class="panel-body">
+
+                    <form class="form-horizontal" role="form" name="form">
+
+                        <div class="input-group" style="margin-bottom:10px;">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                            <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email"
+                                   ng-model="user.mail" required>
+                        </div>
+                        <div class="input-group" style="margin-bottom:10px;">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                            <input type="password" class="form-control" id="exampleInputPassword1"
+                                   placeholder="Password" ng-model="user.pass" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                            <small class="create-account text-muted"><a href="#/recoverpassword">can't remember the password?</a>
+                            </small>
+                            </div>
+                            <div class="col-md-6">
+                        <button class="btn btn-primary btn-block" type="submit" ng-click="login(user)"
+                                ng-disabled="form.$invalid">login
+                        </button>
+                        </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

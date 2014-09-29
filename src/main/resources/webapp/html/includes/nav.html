@@ -1,0 +1,21 @@
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">timecrumbs.io</a>
+        </div>
+
+        <div class="nav navbar-nav navbar-right" ng-hide="userId">
+            <a href="#/signup"><button class="btn btn-success navbar-btn">Create an account</button></a>
+            <a href="#/login"><button class="btn btn-default navbar-btn">Sign in</button></a>
+        </div>
+
+        <div class="nav navbar-nav navbar-right" ng-show="userId">
+            {{username}} |
+            <a ng-click="logout()">Sign out</a>
+        </div>
+
+       </div>
+    </div>
+</nav>
