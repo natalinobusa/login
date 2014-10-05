@@ -5,20 +5,61 @@ var app= angular.module('myApp', ['ngRoute', 'ui.bootstrap']);
 
 app.config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/login',  {templateUrl: 'html/views/login.html', controller: 'loginCtrl'});
-  $routeProvider.when('/signup', {templateUrl: 'html/views/signup.html', controller: 'signupCtrl'});
   $routeProvider.when('/home', {templateUrl: 'html/views/home.html', controller: 'homeCtrl'});
   $routeProvider.otherwise({redirectTo: '/login'});
 }]);
 
-app.run(function($rootScope, $location, userAuthService){
-	var routespermission=['/home'];  //route that require login
-	$rootScope.$on('$routeChangeStart', function(){
-		if( routespermission.indexOf($location.path()) !=-1)
+app.config(['$httpProvider', function($httpProvider) {
+  $httpProvider.defaults.xsrfCookieName = 'csrf';
+  $httpProvider.defaults.xsrfHeaderName = 'X-csrf-token';
+}]);
+
+app.config(function ($httpProvider) {
+  $httpProvider.interceptors.push([
+    '$injector',
+    function ($injector) {
+      return $injector.get('AuthInterceptor');
+    }
+  ]);
+})
+
+app.factory('AuthInterceptor', function ($rootScope, $q, AUTH_EVENTS) {
+    return {
+        responseError: function (response) {
+          $rootScope.$broadcast({
+            401: AUTH_EVENTS.notAuthenticated,
+            403: AUTH_EVENTS.notAuthorized,
+            419: AUTH_EVENTS.sessionTimeout,
+            440: AUTH_EVENTS.sessionTimeout
+          }[response.status], response);
+          return $q.reject(response);
+        }
+    };
+})
+
+app.run(function($rootScope, $location, $http, AUTH_EVENTS, sessionService, userAuthService){
+    var passRoutes = ['/login']
+    $rootScope.$on('$routeChangeStart', function(){
+		if( passRoutes.indexOf($location.path()) ==-1)
 		{
 			var connected=userAuthService.isAuthenticated();
-			connected.then(function(msg){
-				if(!msg.data) $location.path('/login');
-			});
+//			connected.then(function(msg){
+//				if(!msg.data) {
+            if (!connected) {
+				    sessionService.destroy('loggeduser');
+				    $location.path('/login');
+				}
+//			});
+		}
+		if( passRoutes.indexOf($location.path()) !=-1) {
+			var connected=userAuthService.isAuthenticated();
+//			connected.then(function(msg){
+//				if(!msg.data) {
+            if (connected) {
+				    $location.path('/home');
+				}
+//			});
 		}
 	});
+
 });

@@ -13,12 +13,12 @@
                         <div class="input-group" style="margin-bottom:10px;">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                             <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email"
-                                   ng-model="user.mail" required>
+                                   ng-model="credentials.username" required>
                         </div>
                         <div class="input-group" style="margin-bottom:10px;">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
                             <input type="password" class="form-control" id="exampleInputPassword1"
-                                   placeholder="Password" ng-model="user.pass" required>
+                                   placeholder="Password" ng-model="credentials.password" required>
                         </div>
 
                         <div class="row">
@@ -27,7 +27,7 @@
                             </small>
                             </div>
                             <div class="col-md-6">
-                        <button class="btn btn-primary btn-block" type="submit" ng-click="login(user)"
+                        <button class="btn btn-primary btn-block" type="submit" ng-click="login(credentials)"
                                 ng-disabled="form.$invalid">login
                         </button>
                         </div>

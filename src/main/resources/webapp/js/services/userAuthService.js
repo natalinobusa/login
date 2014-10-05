@@ -1,52 +1,32 @@
 'use strict';
-app.factory('userAuthService',function($http, $location, sessionService){
+app.factory('userAuthService',function($http, $rootScope, AUTH_EVENTS, sessionService){
 	return{
-		login:function(data,scope){
-			var $promise=$http.post('/auth/signin',data);
-			$promise.then(function(response){
-				var uid=response.data.uid;
-				if(uid){
-
-					sessionService.set('uid',uid);
-					$location.path('/home');
-					return uid;
-				} else
-{
-                          					scope.addAlert('danger','incorrect information');
-                          					$location.path('/login');
-                          					return null;
-                          				}
-			}, function()  {
-                          					scope.addAlert('danger','login service unavailable right now.');
-                          					$location.path('/login');
-                          					return null;
-                          				});
-		},
-		register:function(data, scope){
-		    var $promise=$http.post('/auth/signup',data);
-        	$promise.then(function(response){
-        		var uid=response.data.uid;
-                if(uid){
-                    sessionService.set('uid',msg);
-                    $location.path('/home');
-                }
-                else  {
-                    scope.msgtxt='The email has already been registered';
-                    $location.path('/signup');
-                }
-            });
+		login:function(credentials){
+		    return $http.post('/auth/signin', credentials)
+		        .then(function(response){
+                    $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
+                    sessionService.set('loggeduser',response.data);
+                    return response.data.username;
+                    },
+                function() {
+                    $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
+                    sessionService.destroy('loggeduser');
+                    return null;
+                });
 		},
 		logout:function(){
-			sessionService.destroy('uid');
-			$location.path('/login');
+		    $http.delete('/auth/session')
+			$rootScope.$broadcast(AUTH_EVENTS.logoutSuccess);
+			sessionService.destroy('loggeduser');
 		},
 		isAuthenticated:function(){
-			var $checkSessionServer=$http.post('/auth/check');
-			return $checkSessionServer;
-			/*
-			if(sessionService.get('user')) return true;
+			//server side authentication
+			//var $checkSessionServer=$http.get('/auth/session');
+			//return $checkSessionServer;
+
+			//client side session check
+			if(sessionService.get('loggeduser')) return true;
 			else return false;
-			*/
 		}
 	}
 });

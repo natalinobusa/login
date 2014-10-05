@@ -6,16 +6,28 @@
             <a class="navbar-brand" href="#">timecrumbs.io</a>
         </div>
 
-        <div class="nav navbar-nav navbar-right" ng-hide="userId">
-            <a href="#/signup"><button class="btn btn-success navbar-btn">Create an account</button></a>
-            <a href="#/login"><button class="btn btn-default navbar-btn">Sign in</button></a>
+        <div class="nav navbar-nav navbar-right" ng-hide="currentUser">
+            <a href="#/signup">
+                <button class="btn btn-success navbar-btn">Create an account</button>
+            </a>
+            <a href="#/login">
+                <button class="btn btn-default navbar-btn">Sign in</button>
+            </a>
         </div>
 
-        <div class="nav navbar-nav navbar-right" ng-show="userId">
-            {{username}} |
-            <a ng-click="logout()">Sign out</a>
-        </div>
+        <ul class="nav navbar-nav navbar-right" ng-show="currentUser">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"> {{currentUser}} <span
+                        class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" ng-click="logout()">Log out</a></li>
+                </ul>
+            </li>
+        </ul>
 
-       </div>
     </div>
 </nav>
