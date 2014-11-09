@@ -1,12 +1,17 @@
 package com.natalinobusa.streaming
 
+import shapeless._
+
+import scala.concurrent.Future
+import scala.util.{Success, Failure}
+
 // the service, actors and paths
 
 import akka.actor._
 import akka.util.Timeout
 import scala.concurrent.duration._
 
-import spray.routing.{RequestContext, HttpService}
+import spray.routing.{Directive, Directive0, RequestContext, HttpService}
 import spray.can.Http
 import spray.util._
 import spray.http._
@@ -16,21 +21,59 @@ import spray.json._
 import DefaultJsonProtocol._
 import spray.httpx.SprayJsonSupport.sprayJsonMarshaller
 
+object Resources {
+  case class ClientSession(csid: String, csrf: String)
+  case class UserSession(usid: String, csid: String, csrf: String, token: String)
+}
+
+import Resources._
+
+trait HashMapMessages[A,B] {
+  // generic messages for resources
+  case class  Get(k:A)
+  case class  Head(k:A)
+  case class  Delete(k:A)
+  case class  Create()
+
+  case class  Update(k: A, v: B)
+  case class  Check(k: A, v: B)
+}
+
+import scala.collection.mutable.HashMap
+
+class HashMapActor[A, B] extends Actor with HashMapMessages[A,B] {
+
+  val map = HashMap.empty[A,B]
+
+  //def uuid = java.util.UUID.randomUUID.toString
+
+  def receive = {
+    case Get(k)      => sender ! map.get(k)
+    case Head(k)     => sender ! map.contains(k)
+    case Delete(k)   => sender ! map.remove(k)
+    case Update(k,v) => sender ! map.update(k,v)
+    case Check(k,v)  => sender ! map.get(k) == Some(v)
+  }
+
+}
+
 class ApiServiceActor extends Actor with ApiService {
 
   // the HttpService trait defines only one abstract member, which
   // connects the services environment to the enclosing actor or test
   def actorRefFactory = context
 
+  val csActor = actorRefFactory.actorOf(Props[HashMapActor[String, ClientSession]], "cs")
+  val usActor = actorRefFactory.actorOf(Props[HashMapActor[String, UserSession]],   "us")
+
   // this actor only runs our route, but you could add
   // other things here, like request stream processing,
   // timeout handling or alternative handler registration
   def receive = runRoute(serviceRoute)
-
 }
 
 // Routing embedded in the actor
-trait ApiService extends HttpService{
+trait ApiService extends HttpService {
 
   // timeouts and implicit execution context for futures
   implicit def executionContext = actorRefFactory.dispatcher
@@ -38,6 +81,37 @@ trait ApiService extends HttpService{
 
   // default logging
   implicit val log = LoggingContext.fromActorRefFactory
+
+  // refer to the sessions actors
+  def clientSessionActor = actorRefFactory.actorSelection("/user/api/cs")
+  def userSessionActor   = actorRefFactory.actorSelection("/user/api/us")
+
+  val getSessionData = cookie("csid") & cookie("csrf") & headerValueByName("X-csrf-token")
+
+  def checkClientSessionData(csid:String, csrf:String) = Future {
+    csid == csrf
+  }
+
+  def checkUserSessionData(usid:String, csid:String, csrf:String) = Future {
+    csid == csrf
+  }
+
+  val setSessionCookies = {
+
+  }
+
+  val validateSession: Directive0 = {
+    getSessionData.hflatMap {
+      case csidCookie :: csrfCookie :: csrfHeader :: HNil =>
+        if (csrfCookie.content != csrfHeader)
+          reject
+        else
+          onComplete( checkClientSessionData(csidCookie.content,csrfCookie.content) ).flatMap {
+            case Success(value) => pass
+            case Failure(ex) => reject
+          }
+    }
+  }
 
   // user session route
   val userAuthRoute = {

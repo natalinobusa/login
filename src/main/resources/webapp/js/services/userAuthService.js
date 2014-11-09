@@ -20,10 +20,6 @@ app.factory('userAuthService',function($http, $rootScope, AUTH_EVENTS, sessionSe
 			sessionService.destroy('loggeduser');
 		},
 		isAuthenticated:function(){
-			//server side authentication
-			//var $checkSessionServer=$http.get('/auth/session');
-			//return $checkSessionServer;
-
 			//client side session check
 			if(sessionService.get('loggeduser')) return true;
 			else return false;

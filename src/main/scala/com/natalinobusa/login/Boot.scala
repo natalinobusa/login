@@ -11,6 +11,6 @@ object Boot extends App {
   val service = system.actorOf(Props[ApiServiceActor], "api")
   
   // start a new HTTP server with our service actor as the handler
-  IO(Http) ! Http.Bind(service, "localhost", port = 8888)
+  IO(Http) ! Http.Bind(service, "0.0.0.0", port = 8888)
 
 }

@@ -38,28 +38,26 @@ app.factory('AuthInterceptor', function ($rootScope, $q, AUTH_EVENTS) {
 })
 
 app.run(function($rootScope, $location, $http, AUTH_EVENTS, sessionService, userAuthService){
-    var passRoutes = ['/login']
+    var loginRoutes    = ['/login']
+    var loggedRoutes   = ['/home']
     $rootScope.$on('$routeChangeStart', function(){
-		if( passRoutes.indexOf($location.path()) ==-1)
+		// logged routes not available if not authenticated
+		if( loggedRoutes.indexOf($location.path()) !=-1)
 		{
 			var connected=userAuthService.isAuthenticated();
-//			connected.then(function(msg){
-//				if(!msg.data) {
             if (!connected) {
-				    sessionService.destroy('loggeduser');
-				    $location.path('/login');
-				}
-//			});
+                sessionService.destroy('loggeduser');
+                $location.path('/login');
+                return
+            }
 		}
+		// login route only available if not authenticated
 		if( passRoutes.indexOf($location.path()) !=-1) {
 			var connected=userAuthService.isAuthenticated();
-//			connected.then(function(msg){
-//				if(!msg.data) {
             if (connected) {
-				    $location.path('/home');
-				}
-//			});
+                $location.path('/home');
+                return;
+            }
 		}
 	});
-
 });
